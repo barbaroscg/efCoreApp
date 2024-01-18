@@ -11,55 +11,65 @@ using Microsoft.Extensions.Logging;
 namespace efCoreApp.Controllers
 {
     
-    public class OgrenciController : Controller
+    public class KursController : Controller
     {
+       
         private readonly DataContext _context;
 
-        public OgrenciController(DataContext context)
+        public KursController(DataContext context)
         {
             _context = context;
         }
-        
-        public IActionResult Create()
-        {
-        return View();
-        }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(Ogrenci model)
-        {
-            _context.Ogrenciler.Add(model);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
-        }
 
         public async Task<IActionResult> Index()
         {
-            var ogrenciler = await _context.Ogrenciler.ToListAsync();
-            return View(ogrenciler);
+            var kurslar = await _context.Kurslar.ToListAsync();
+            return View(kurslar);
         }
 
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if(id == null)
-            {
-                return NotFound();
-            }
-            
-            var ogrenci = await _context.Ogrenciler.FindAsync(id);
-            if(ogrenci == null)
-            {
-                return NotFound();
-            }
-            return View(ogrenci);
 
+        public IActionResult Create()
+        {
+            return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, Ogrenci model)
+        public async Task<IActionResult> Create(Kurs model)
         {
-            if(id != model.OgrenciId)
+            if(ModelState.IsValid)
+            {
+
+            _context.Kurslar.Add(model);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
+            }
+            return View(model);
+        }
+
+        
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if(id==null)
+            {
+                return NotFound();
+            }
+
+            var kurs = await _context.Kurslar.FindAsync(id);
+            if(kurs == null)
+            {
+                return NotFound();
+            }
+            return View(kurs);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int? id, Kurs model)
+        {
+            if(id != model.KursId)
             {
                 return NotFound();
             }
@@ -68,12 +78,12 @@ namespace efCoreApp.Controllers
             {
                 try
                 {
-                    _context.Ogrenciler.Update(model);
+                    _context.Kurslar.Update(model);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.Ogrenciler.Any(x => x.OgrenciId == model.OgrenciId))
+                    if (!_context.Kurslar.Any(x => x.KursId == model.KursId))
                     {
                         return NotFound();
                     }else{
@@ -94,27 +104,24 @@ namespace efCoreApp.Controllers
                 return NotFound();
             }
             
-            var ogrenci = await _context.Ogrenciler.FindAsync(id);
-            if(ogrenci == null)
+            var kurs = await _context.Kurslar.FindAsync(id);
+            if(kurs == null)
             {
                 return NotFound();
             }
-            return View(ogrenci);
+            return View(kurs);
 
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteX([FromForm]int? id)
+        public async Task<IActionResult> Delete(Kurs entity)
         {
-            var ogrenci = await _context.Ogrenciler.FindAsync(id);
-            if(ogrenci == null)
-            {
-                return NotFound();
-            }
-            _context.Ogrenciler.Remove(ogrenci);
+           
+            _context.Kurslar.Remove(entity);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
 
         }
+       
     }
 }
