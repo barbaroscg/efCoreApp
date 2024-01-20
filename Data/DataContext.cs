@@ -16,6 +16,7 @@ namespace efCoreApp.Data
         public DbSet<Kurs> Kurslar { get; set; }
         public DbSet<Ogrenci> Ogrenciler { get; set; }
         public DbSet<KursKayit> KursKayitlari { get; set; }
+        public DbSet<Ogretmen> Ogretmenler { get; set; }
 
         // public DbSet<Kurs> Kurslar => Set<Kurs>();
         // public DbSet<Ogrenci> Ogrenciler => Set<Ogrenci>();

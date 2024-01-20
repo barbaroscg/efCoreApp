@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using efCoreApp.Data;
+using efCoreApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -24,24 +26,28 @@ namespace efCoreApp.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var kurslar = await _context.Kurslar.ToListAsync();
+            var kurslar = await _context.Kurslar.Include(x => x.Ogretmen).ToListAsync();
             return View(kurslar);
         }
 
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewBag.Ogretmenler = new SelectList(await _context.Ogretmenler.ToListAsync(), "OgretmenId", "AdSoyad");
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Kurs model)
+        public async Task<IActionResult> Create(KursViewModel model)
         {
             if(ModelState.IsValid)
             {
-
-            _context.Kurslar.Add(model);
+                var kurs = new Kurs();
+                kurs.Baslik = model.Baslik;
+                kurs.OgretmenId = model.OgretmenId;
+                kurs.KursKayitlari = model.KursKayitlari;
+            _context.Kurslar.Add(kurs);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
             }
@@ -56,18 +62,22 @@ namespace efCoreApp.Controllers
                 return NotFound();
             }
 
-            var kurs = await _context.Kurslar.FindAsync(id);
+            var kurs = await _context.Kurslar.
+                            Include(k => k.KursKayitlari).
+                            ThenInclude(x => x.Ogrenci).
+                            FirstOrDefaultAsync(x => x.KursId == id);
             if(kurs == null)
             {
                 return NotFound();
             }
+            ViewBag.Ogretmenler = new SelectList(await _context.Ogretmenler.ToListAsync(), "OgretmenId", "AdSoyad");
             return View(kurs);
         }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, Kurs model)
+        public async Task<IActionResult> Edit(int? id, KursViewModel model)
         {
             if(id != model.KursId)
             {
@@ -78,7 +88,12 @@ namespace efCoreApp.Controllers
             {
                 try
                 {
-                    _context.Kurslar.Update(model);
+                    _context.Update(new Kurs() {
+                        KursId = model.KursId,
+                        Baslik = model.Baslik,
+                        OgretmenId = model.OgretmenId,
+                        KursKayitlari = model.KursKayitlari
+                    });
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

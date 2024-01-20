@@ -46,7 +46,10 @@ namespace efCoreApp.Controllers
                 return NotFound();
             }
             
-            var ogrenci = await _context.Ogrenciler.FindAsync(id);
+            var ogrenci = await _context.Ogrenciler.
+                                Include(o => o.KursKayitlari).
+                                ThenInclude(o => o.Kurs)
+                                .FirstOrDefaultAsync(o => o.OgrenciId == id);
             if(ogrenci == null)
             {
                 return NotFound();

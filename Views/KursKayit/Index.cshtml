@@ -1,1 +1,33 @@
-<h1 class="display-1 text-success">Başarılı</h1>
+<!-- <h1 class="display-1 text-success">Başarılı</h1> -->
+@model IEnumerable<KursKayit>
+
+    @{
+        ViewData["Title"] = "Öğrenci Listesi";
+    }
+
+    <h2>Öğrenci Listesi</h2>
+    <hr>
+<table class="table table-hover table-dark table-striped table-bordered">
+    <thead>
+        <tr>
+            <th style="width: 150px;">@Html.DisplayNameFor(m => m.KayitId)</th>
+            <th>@Html.DisplayNameFor(m => m.Ogrenci.OgrenciAd)</th>
+            <th>@Html.DisplayNameFor(m => m.Kurs.Baslik)</th>
+            <th style="width: 150px; " ></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in @Model)
+        {
+            <tr>
+                <td>@item.KayitId</td>
+                <td>@item.Ogrenci.OgrenciAd</td>
+                <td>@item.Kurs.Baslik</td>
+                <td class="text-center">
+                    <a asp-controller="Ogrenci" asp-action="Edit" asp-route-id="@item.OgrenciId" class="btn btn-sm btn-primary">Edit</a>
+                    <a asp-controller="Ogrenci" asp-action="Delete" asp-route-id="@item.OgrenciId" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
